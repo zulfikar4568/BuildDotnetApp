@@ -1,0 +1,130 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: Build .NET App
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  
+env:
+  APPLICATION_NAME: BuildDotnetApp
+  APPLICATION_NAME_2: BuildDotnetApp.CLI
+
+jobs:
+  build:
+
+    # When the workflow runs, this is the name that is logged
+    # This job will run three times, once for each "os" defined
+    name: build-${{matrix.os}}
+    runs-on: ${{ matrix.os }}
+    if: ${{ github.ref == 'refs/heads/master' }}
+    strategy:
+      matrix:
+        os: [windows-latest]
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1
+    
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1.0.5
+
+    - name: Setup VSTest Path
+      uses: darenm/Setup-VSTest@v1.2
+      
+    - name: Restore Nuget Packages
+      run: nuget restore ${{env.APPLICATION_NAME}}.sln
+    
+    - name: Build the Solution
+      run: msbuild ${{env.APPLICATION_NAME}}.sln /p:Configuration=Release
+    
+    - name: Test the Application
+      run: vstest.console.exe ./${{env.APPLICATION_NAME}}.Test/bin/x64/Release/${{env.APPLICATION_NAME}}.Test.dll /Platform:x64
+      
+    - name: Install Versionize
+      run: dotnet tool install --global Versionize
+      
+    - name: Setup git
+      run: |
+        git config --local user.email "isnaen70@gmail.com"
+        git config --local user.name "zulfikar4568"
+        
+    - name: Versionize Release
+      id: versionize
+      run: versionize --exit-insignificant-commits
+      continue-on-error: true
+      
+    - name: No release required
+      if: steps.versionize.outcome != 'success'
+      run: echo "Skipping Release. No release required."
+
+    - name: Build
+      if: steps.versionize.outcome == 'success'
+      shell: bash
+      run: |
+        tag=$(git describe --tags --abbrev=0)
+        prefix="v"
+        tag_no_v=${tag#"$prefix"}
+
+        echo "TAG=$tag" >> $GITHUB_ENV
+        echo "TAG_NO_V=$tag_no_v" >> $GITHUB_ENV
+        echo "APP_NAME=${tag}-x64.zip" >> $GITHUB_ENV
+        echo "APP_NAME_2=${tag}-cli-x64.zip" >> $GITHUB_ENV
+        
+        # Pack to zip for Windows
+        7z a -tzip "${tag}-x64.zip" "./${APPLICATION_NAME}/bin/x64/Release/*"
+        7z a -tzip "${tag}-cli-x64.zip" "./${APPLICATION_NAME_2}/bin/x64/Release/*"
+      
+    - name: Push changes to GitHub
+      if: steps.versionize.outcome == 'success'
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }}
+        tags: true
+
+    - name: Publish and Release
+      if: steps.versionize.outcome == 'success'
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          ${{ env.APP_NAME }}
+          ${{ env.APP_NAME_2 }}
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+        tag_name: ${{ env.TAG }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Set version in all AssemblyInfo.cs files
+      if: steps.versionize.outcome == 'success'
+      uses: secondbounce/assemblyinfo-update@v2
+      with:
+        version: ${{ env.TAG_NO_V }}
+    
+    - name: Commit the AssemblyInfo.cs"
+      if: steps.versionize.outcome == 'success'
+      run: |
+        git status
+        git commit -a -m "chore(update): ${{ env.TAG }} push to the AssemblyInfo.cs"
+
+    - name: Push changes to GitHub
+      if: steps.versionize.outcome == 'success'
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }}
+        tags: true
