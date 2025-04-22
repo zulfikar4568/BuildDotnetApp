@@ -48,7 +48,7 @@ jobs:
       run: nuget restore ${{env.APPLICATION_NAME}}.sln
     
     - name: Build the Solution
-      run: msbuild ${{env.APPLICATION_NAME}}.sln /p:Configuration=Release
+      run: msbuild ${{env.APPLICATION_NAME}}.sln /p:Configuration=Release /p:Platform=x64 /verbosity:detailed
     
     - name: Test the Application
       run: vstest.console.exe ./${{env.APPLICATION_NAME}}.Test/bin/x64/Release/${{env.APPLICATION_NAME}}.Test.dll /Platform:x64
