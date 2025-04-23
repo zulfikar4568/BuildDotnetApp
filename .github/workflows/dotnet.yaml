@@ -87,6 +87,22 @@ jobs:
         7z a -tzip "${tag}-x64.zip" "./${APPLICATION_NAME}/bin/x64/Release/*"
         7z a -tzip "${tag}-cli-x64.zip" "./${APPLICATION_NAME_2}/bin/x64/Release/*"
       
+    - name: Install WiX Toolset
+      if: steps.versionize.outcome == 'success'
+      run: |
+        $url = "https://github.com/wixtoolset/wix3/releases/download/wix3112rtm/wix311-binaries.zip"
+        $output = "wix.zip"
+        Invoke-WebRequest -Uri $url -OutFile $output
+        Expand-Archive -Path $output -DestinationPath "C:\wix"
+        Add-Content $env:GITHUB_PATH "C:\wix"
+      
+    - name: Build MSI Installer
+      if: steps.versionize.outcome == 'success'
+      shell: pwsh
+      run: |
+        .\installer\build.ps1
+        echo "MSI_NAME=BuildDotnetApp-${{ env.TAG_NO_V }}-x64.msi" >> $env:GITHUB_ENV
+      
     - name: Push changes to GitHub
       if: steps.versionize.outcome == 'success'
       uses: ad-m/github-push-action@master
@@ -102,6 +118,7 @@ jobs:
         files: |
           ${{ env.APP_NAME }}
           ${{ env.APP_NAME_2 }}
+          installer/${{ env.MSI_NAME }}
         draft: false
         prerelease: false
         generate_release_notes: true
