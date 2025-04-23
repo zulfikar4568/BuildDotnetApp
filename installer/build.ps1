@@ -17,6 +17,7 @@ if (Test-Path $outputDir) {
 New-Item -ItemType Directory -Force -Path $outputDir
 
 # Copy files to output directory
+Write-Host "Copying application files..."
 Copy-Item -Path ".\BuildDotnetApp\bin\x64\Release\*" -Destination $outputDir -Recurse
 Copy-Item -Path ".\BuildDotnetApp.CLI\bin\x64\Release\*" -Destination $outputDir -Recurse
 
@@ -33,7 +34,7 @@ Write-Host "Compiling WiX files..."
 candle -nologo -arch x64 -dSourceDir="$outputDir" -dVersion="$version" ".\installer\product.wxs" ".\installer\fragment.wxs" -out ".\installer\"
 
 Write-Host "Linking WiX files..."
-light -nologo -ext WixUIExtension -ext WixUtilExtension -out ".\installer\BuildDotnetApp-$version-x64.msi" ".\installer\product.wixobj" ".\installer\fragment.wixobj"
+light -nologo -ext WixUIExtension -ext WixUtilExtension -out ".\installer\BuildDotnetApp-$version-x64.msi" ".\installer\product.wixobj" ".\installer\fragment.wixobj" -b "$outputDir"
 
 # Clean up
 Write-Host "Cleaning up temporary files..."
