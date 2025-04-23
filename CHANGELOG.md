@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="1.4.0"></a>
+## [1.4.0](https://www.github.com/zulfikar4568/BuildDotnetApp/releases/tag/v1.4.0) (2025-04-23)
+
+### Features
+
+* add cli to env path ([f7b2d4f](https://www.github.com/zulfikar4568/BuildDotnetApp/commit/f7b2d4ffa2b17521c389377696b0942927904403))
+
+### Bug Fixes
+
+* guid ([8ee2821](https://www.github.com/zulfikar4568/BuildDotnetApp/commit/8ee2821b26cc47ec593148edf723511ce5a936ef))
+* path cli ([2ded0e3](https://www.github.com/zulfikar4568/BuildDotnetApp/commit/2ded0e3cec451b58383de5951ff024c3973df35a))
+* the create folder ([2e80752](https://www.github.com/zulfikar4568/BuildDotnetApp/commit/2e807521de601c17686e45cb46a48112a3b1fc19))
+
 <a name="1.3.0"></a>
 ## [1.3.0](https://www.github.com/zulfikar4568/BuildDotnetApp/releases/tag/v1.3.0) (2025-04-23)
 
