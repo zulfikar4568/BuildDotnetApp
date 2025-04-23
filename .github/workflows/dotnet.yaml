@@ -82,7 +82,7 @@ jobs:
       run: nuget restore ${{env.APPLICATION_NAME}}.sln
     
     - name: Build the Solution
-      run: msbuild ${{env.APPLICATION_NAME}}.sln /p:Configuration=Release /p:Platform=x64 /verbosity:detailed
+      run: msbuild ${{env.APPLICATION_NAME}}.sln /p:Configuration=Release /p:Platform=x64
 
   test:
     name: Run Tests
@@ -93,15 +93,32 @@ jobs:
       with:
         fetch-depth: 0
     
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1
+    
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1.0.5
+
     - name: Setup VSTest Path
       uses: darenm/Setup-VSTest@v1.2
       
+    - name: Restore Nuget Packages
+      run: nuget restore ${{env.APPLICATION_NAME}}.sln
+    
+    - name: Build the Solution
+      run: msbuild ${{env.APPLICATION_NAME}}.sln /p:Configuration=Release /p:Platform=x64
+      
     - name: Test the Application
-      run: vstest.console.exe ./${{env.APPLICATION_NAME}}.Test/bin/x64/Release/${{env.APPLICATION_NAME}}.Test.dll /Platform:x64
+      run: vstest.console.exe "${{env.APPLICATION_NAME}}.Test/bin/x64/Release/${{env.APPLICATION_NAME}}.Test.dll" /Platform:x64
 
   package:
     name: Create Packages
-    needs: [setup, build]
+    needs: [setup, build, test]
     if: needs.setup.outputs.tag != ''
     runs-on: windows-latest
     steps:
@@ -136,7 +153,7 @@ jobs:
       shell: pwsh
       run: |
         .\installer\build.ps1
-        echo "MSI_NAME=BuildDotnetApp-${{ needs.setup.outputs.tag_no_v }}-x64.msi" >> $env:GITHUB_ENV
+        echo "MSI_NAME=${{env.APPLICATION_NAME}}-${{ needs.setup.outputs.tag_no_v }}-x64.msi" >> $env:GITHUB_ENV
 
   release:
     name: Create Release
