@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="1.1.0"></a>
+## [1.1.0](https://www.github.com/zulfikar4568/BuildDotnetApp/releases/tag/v1.1.0) (2025-04-23)
+
+### Features
+
+* add wix version 3 ([1283a96](https://www.github.com/zulfikar4568/BuildDotnetApp/commit/1283a96da14cf7bb3b5112c6963f5a96aa675518))
+
+### Bug Fixes
+
+* build ([e67a0a6](https://www.github.com/zulfikar4568/BuildDotnetApp/commit/e67a0a6af462bfc721d480a0a2b53def879beaef))
+* ci ([21d6e4b](https://www.github.com/zulfikar4568/BuildDotnetApp/commit/21d6e4b2a8ed98020c2a0787a3463bc540fa1302))
+* remove detailed ([57156b2](https://www.github.com/zulfikar4568/BuildDotnetApp/commit/57156b2d6ba47d7a3afba68417ba846f19b0d86d))
+* the CI ([675230e](https://www.github.com/zulfikar4568/BuildDotnetApp/commit/675230e80bcbe1db6dbfff14465d6627bc525afb))
+* wix file ([ca026e8](https://www.github.com/zulfikar4568/BuildDotnetApp/commit/ca026e897bec8380ed42594a5c33455ac3eaac77))
+
 <a name="1.0.0"></a>
 ## [1.0.0](https://www.github.com/zulfikar4568/BuildDotnetApp/releases/tag/v1.0.0) (2025-04-22)
 
