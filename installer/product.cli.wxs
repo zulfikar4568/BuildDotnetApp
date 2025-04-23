@@ -25,7 +25,7 @@
         <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch BuildDotnetApp.CLI" />
         <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
 
-        <Component Id="PathEnvironment" Guid="*" Directory="INSTALLFOLDER">
+        <Component Id="PathEnvironment" Guid="B4A3F3D2-1A2B-4C3D-9E8F-7A6B5C4D3E2F" Directory="INSTALLFOLDER">
             <Environment Id="Path" Name="PATH" Value="[INSTALLFOLDER]" Permanent="no" Part="last" Action="set" System="yes" />
         </Component>
     </Product>
