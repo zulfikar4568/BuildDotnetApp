@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="1.3.0"></a>
+## [1.3.0](https://www.github.com/zulfikar4568/BuildDotnetApp/releases/tag/v1.3.0) (2025-04-23)
+
+### Features
+
+* certificate and path ([b2c74df](https://www.github.com/zulfikar4568/BuildDotnetApp/commit/b2c74df142040e83b3fb795a65f73caa6b783ac3))
+
+### Bug Fixes
+
+* remove cert ([beb31c1](https://www.github.com/zulfikar4568/BuildDotnetApp/commit/beb31c172408272fead21dce4dda7ed76f8db70b))
+* remove env path ([d9f290b](https://www.github.com/zulfikar4568/BuildDotnetApp/commit/d9f290bf050b376db6f07c0b54b296c00f413699))
+* the wixobj ([467fd4c](https://www.github.com/zulfikar4568/BuildDotnetApp/commit/467fd4c2deab15fc9adf3c8dce0885a3061a58f4))
+
 <a name="1.2.1"></a>
 ## [1.2.1](https://www.github.com/zulfikar4568/BuildDotnetApp/releases/tag/v1.2.1) (2025-04-23)
 
