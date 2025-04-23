@@ -36,7 +36,7 @@ Write-Host "Compiling WiX files for main application..."
 candle -nologo -arch x64 -dSourceDir="$outputDirMain" -dVersion="$version" ".\installer\product.wxs" ".\installer\fragment.main.wxs" -out ".\installer\"
 
 Write-Host "Linking WiX files for main application..."
-light -nologo -ext WixUIExtension -ext WixUtilExtension -out ".\installer\BuildDotnetApp-$version-x64.msi" ".\installer\product.wixobj" ".\installer\fragment.main.wixobj" -b "$outputDirMain"
+light -nologo -ext WixUIExtension -ext WixUtilExtension -out ".\installer\v$version-x64.msi" ".\installer\product.wixobj" ".\installer\fragment.main.wixobj" -b "$outputDirMain"
 
 # Build CLI application installer
 Write-Host "Building CLI application installer..."
@@ -47,7 +47,7 @@ Write-Host "Compiling WiX files for CLI application..."
 candle -nologo -arch x64 -dSourceDir="$outputDirCli" -dVersion="$version" ".\installer\product.cli.wxs" ".\installer\fragment.cli.wxs" -out ".\installer\"
 
 Write-Host "Linking WiX files for CLI application..."
-light -nologo -ext WixUIExtension -ext WixUtilExtension -out ".\installer\BuildDotnetApp.CLI-$version-x64.msi" ".\installer\product.cli.wixobj" ".\installer\fragment.cli.wixobj" -b "$outputDirCli"
+light -nologo -ext WixUIExtension -ext WixUtilExtension -out ".\installer\v$version-cli-x64.msi" ".\installer\product.cli.wixobj" ".\installer\fragment.cli.wixobj" -b "$outputDirCli"
 
 # Clean up
 Write-Host "Cleaning up temporary files..."
