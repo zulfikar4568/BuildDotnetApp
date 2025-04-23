@@ -14,17 +14,12 @@ env:
   APPLICATION_NAME_2: BuildDotnetApp.CLI
 
 jobs:
-  build:
-
-    # When the workflow runs, this is the name that is logged
-    # This job will run three times, once for each "os" defined
-    name: build-${{matrix.os}}
-    runs-on: ${{ matrix.os }}
-    if: ${{ github.ref == 'refs/heads/master' }}
-    strategy:
-      matrix:
-        os: [windows-latest]
-
+  setup:
+    name: Setup Environment
+    runs-on: windows-latest
+    outputs:
+      tag: ${{ steps.versionize.outputs.tag }}
+      tag_no_v: ${{ steps.versionize.outputs.tag_no_v }}
     steps:
     - uses: actions/checkout@v3
       with:
@@ -44,40 +39,82 @@ jobs:
     - name: Setup VSTest Path
       uses: darenm/Setup-VSTest@v1.2
       
-    - name: Restore Nuget Packages
-      run: nuget restore ${{env.APPLICATION_NAME}}.sln
-    
-    - name: Build the Solution
-      run: msbuild ${{env.APPLICATION_NAME}}.sln /p:Configuration=Release /p:Platform=x64 /verbosity:detailed
-    
-    - name: Test the Application
-      run: vstest.console.exe ./${{env.APPLICATION_NAME}}.Test/bin/x64/Release/${{env.APPLICATION_NAME}}.Test.dll /Platform:x64
-      
     - name: Install Versionize
       run: dotnet tool install --global Versionize
       
     - name: Setup git
       run: |
-        git config --local user.email "isnaen70@gmail.com"
+        git config --local user.email "isnae70@gmail.com"
         git config --local user.name "zulfikar4568"
         
     - name: Versionize Release
       id: versionize
-      run: versionize --exit-insignificant-commits
-      continue-on-error: true
-      
-    - name: No release required
-      if: steps.versionize.outcome != 'success'
-      run: echo "Skipping Release. No release required."
-
-    - name: Build
-      if: steps.versionize.outcome == 'success'
-      shell: bash
       run: |
+        versionize --exit-insignificant-commits
         tag=$(git describe --tags --abbrev=0)
         prefix="v"
         tag_no_v=${tag#"$prefix"}
+        echo "tag=$tag" >> $GITHUB_OUTPUT
+        echo "tag_no_v=$tag_no_v" >> $GITHUB_OUTPUT
+      continue-on-error: true
 
+  build:
+    name: Build Solution
+    needs: setup
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1
+    
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1.0.5
+      
+    - name: Restore Nuget Packages
+      run: nuget restore ${{env.APPLICATION_NAME}}.sln
+    
+    - name: Build the Solution
+      run: msbuild ${{env.APPLICATION_NAME}}.sln /p:Configuration=Release /p:Platform=x64 /verbosity:detailed
+
+  test:
+    name: Run Tests
+    needs: build
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    
+    - name: Setup VSTest Path
+      uses: darenm/Setup-VSTest@v1.2
+      
+    - name: Test the Application
+      run: vstest.console.exe ./${{env.APPLICATION_NAME}}.Test/bin/x64/Release/${{env.APPLICATION_NAME}}.Test.dll /Platform:x64
+
+  package:
+    name: Create Packages
+    needs: [setup, build]
+    if: needs.setup.outputs.tag != ''
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Create Zip Packages
+      shell: bash
+      run: |
+        tag=${{ needs.setup.outputs.tag }}
+        tag_no_v=${{ needs.setup.outputs.tag_no_v }}
+        
         echo "TAG=$tag" >> $GITHUB_ENV
         echo "TAG_NO_V=$tag_no_v" >> $GITHUB_ENV
         echo "APP_NAME=${tag}-x64.zip" >> $GITHUB_ENV
@@ -86,9 +123,8 @@ jobs:
         # Pack to zip for Windows
         7z a -tzip "${tag}-x64.zip" "./${APPLICATION_NAME}/bin/x64/Release/*"
         7z a -tzip "${tag}-cli-x64.zip" "./${APPLICATION_NAME_2}/bin/x64/Release/*"
-      
+
     - name: Install WiX Toolset
-      if: steps.versionize.outcome == 'success'
       run: |
         $url = "https://github.com/wixtoolset/wix3/releases/download/wix3112rtm/wix311-binaries.zip"
         $output = "wix.zip"
@@ -97,14 +133,22 @@ jobs:
         Add-Content $env:GITHUB_PATH "C:\wix"
       
     - name: Build MSI Installer
-      if: steps.versionize.outcome == 'success'
       shell: pwsh
       run: |
         .\installer\build.ps1
-        echo "MSI_NAME=BuildDotnetApp-${{ env.TAG_NO_V }}-x64.msi" >> $env:GITHUB_ENV
-      
+        echo "MSI_NAME=BuildDotnetApp-${{ needs.setup.outputs.tag_no_v }}-x64.msi" >> $env:GITHUB_ENV
+
+  release:
+    name: Create Release
+    needs: [setup, package]
+    if: needs.setup.outputs.tag != ''
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
     - name: Push changes to GitHub
-      if: steps.versionize.outcome == 'success'
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -112,7 +156,6 @@ jobs:
         tags: true
 
     - name: Publish and Release
-      if: steps.versionize.outcome == 'success'
       uses: softprops/action-gh-release@v1
       with:
         files: |
@@ -122,24 +165,21 @@ jobs:
         draft: false
         prerelease: false
         generate_release_notes: true
-        tag_name: ${{ env.TAG }}
+        tag_name: ${{ needs.setup.outputs.tag }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Set version in all AssemblyInfo.cs files
-      if: steps.versionize.outcome == 'success'
       uses: secondbounce/assemblyinfo-update@v2
       with:
-        version: ${{ env.TAG_NO_V }}
+        version: ${{ needs.setup.outputs.tag_no_v }}
     
-    - name: Commit the AssemblyInfo.cs"
-      if: steps.versionize.outcome == 'success'
+    - name: Commit the AssemblyInfo.cs
       run: |
         git status
-        git commit -a -m "chore(update): ${{ env.TAG }} push to the AssemblyInfo.cs"
+        git commit -a -m "chore(update): ${{ needs.setup.outputs.tag }} push to the AssemblyInfo.cs"
 
     - name: Push changes to GitHub
-      if: steps.versionize.outcome == 'success'
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}

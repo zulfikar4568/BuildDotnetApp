@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
-    <Product Id="*" Name="BuildDotnetApp" Language="1033" Version="$(var.Version)" Manufacturer="Your Company" UpgradeCode="PUT-GUID-HERE">
+    <Product Id="*" Name="BuildDotnetApp" Language="1033" Version="$(var.Version)" Manufacturer="JnTDigital" UpgradeCode="f3c8d7a2-6c97-4b1a-8e3e-2e1f9b0fc3aa">
         <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
         
         <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
