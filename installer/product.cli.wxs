@@ -23,16 +23,5 @@
         <WixVariable Id="WixUILicenseRtf" Value=".\installer\LICENSE.rtf" />
         <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch BuildDotnetApp.CLI" />
         <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
-
-        <!-- Add PATH environment variable -->
-        <CustomAction Id="AddToPath" Property="Path" Value="[INSTALLFOLDER]" Execute="firstSequence" />
-        <CustomAction Id="RemoveFromPath" Property="Path" Value="[INSTALLFOLDER]" Execute="firstSequence" />
-        
-        <InstallExecuteSequence>
-            <Custom Action="AddToPath" After="InstallFiles">NOT Installed</Custom>
-            <Custom Action="RemoveFromPath" Before="RemoveFiles">Installed AND REMOVE="ALL"</Custom>
-        </InstallExecuteSequence>
-
-        <Environment Id="Path" Name="PATH" Value="[INSTALLFOLDER]" Permanent="no" Part="last" Action="set" System="yes" />
     </Product>
 </Wix> 
