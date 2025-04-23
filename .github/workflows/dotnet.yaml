@@ -58,7 +58,7 @@ jobs:
       
     - name: Setup git
       run: |
-        git config --local user.email "isnaen70@gmail.com"
+        git config --local user.email "isnae70@gmail.com"
         git config --local user.name "zulfikar4568"
         
     - name: Versionize Release
@@ -96,13 +96,14 @@ jobs:
         Expand-Archive -Path $output -DestinationPath "C:\wix"
         Add-Content $env:GITHUB_PATH "C:\wix"
       
-    - name: Build MSI Installer
+    - name: Build MSI Installers
       if: steps.versionize.outcome == 'success'
       shell: pwsh
       run: |
         .\installer\build.ps1
-        echo "MSI_NAME=${{env.APPLICATION_NAME}}-${{ env.TAG_NO_V }}-x64.msi" >> $env:GITHUB_ENV
-      
+        echo "MSI_NAME=v${{ env.TAG_NO_V }}-x64.msi" >> $env:GITHUB_ENV
+        echo "MSI_NAME_2=v${{ env.TAG_NO_V }}-cli-x64.msi" >> $env:GITHUB_ENV
+        
     - name: Push changes to GitHub
       if: steps.versionize.outcome == 'success'
       uses: ad-m/github-push-action@master
@@ -119,6 +120,7 @@ jobs:
           ${{ env.APP_NAME }}
           ${{ env.APP_NAME_2 }}
           installer/${{ env.MSI_NAME }}
+          installer/${{ env.MSI_NAME_2 }}
         draft: false
         prerelease: false
         generate_release_notes: true
