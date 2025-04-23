@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="1.2.1"></a>
+## [1.2.1](https://www.github.com/zulfikar4568/BuildDotnetApp/releases/tag/v1.2.1) (2025-04-23)
+
+### Bug Fixes
+
+* package msi name ([4e8ae82](https://www.github.com/zulfikar4568/BuildDotnetApp/commit/4e8ae82277e0b5a99e3f420ed9a0dc05f79ff972))
+
 <a name="1.2.0"></a>
 ## [1.2.0](https://www.github.com/zulfikar4568/BuildDotnetApp/releases/tag/v1.2.0) (2025-04-23)
 
