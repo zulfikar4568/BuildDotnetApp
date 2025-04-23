@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="1.2.0"></a>
+## [1.2.0](https://www.github.com/zulfikar4568/BuildDotnetApp/releases/tag/v1.2.0) (2025-04-23)
+
+### Features
+
+* separate the installer ([f959091](https://www.github.com/zulfikar4568/BuildDotnetApp/commit/f9590915f342efab96aa0d475462bd0bba19d577))
+
 <a name="1.1.1"></a>
 ## [1.1.1](https://www.github.com/zulfikar4568/BuildDotnetApp/releases/tag/v1.1.1) (2025-04-23)
 
