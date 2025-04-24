@@ -60,7 +60,7 @@ jobs:
       run: versionize --exit-insignificant-commits
       continue-on-error: true
 
-    - name: Create a tag and zip app file name
+    - name: Create a tag
       if: steps.versionize.outcome == 'success'
       shell: bash
       run: |
@@ -70,8 +70,6 @@ jobs:
 
         echo "TAG=$tag" >> $GITHUB_ENV
         echo "TAG_NO_V=$tag_no_v" >> $GITHUB_ENV
-        echo "APP_NAME=${tag}-x64.zip" >> $GITHUB_ENV
-        echo "APP_NAME_2=${tag}-cli-x64.zip" >> $GITHUB_ENV
 
     - name: Set version in all AssemblyInfo.cs files
       if: steps.versionize.outcome == 'success'
@@ -100,8 +98,8 @@ jobs:
       shell: bash
       run: |
         # Pack to zip for Windows
-        7z a -tzip "${tag}-x64.zip" "./${APPLICATION_NAME}/bin/x64/Release/*"
-        7z a -tzip "${tag}-cli-x64.zip" "./${APPLICATION_NAME_2}/bin/x64/Release/*"
+        7z a -tzip "${{ env.TAG_NO_V }}-x64.zip" "./${APPLICATION_NAME}/bin/x64/Release/*"
+        7z a -tzip "${{ env.TAG_NO_V }}-cli-x64.zip" "./${APPLICATION_NAME_2}/bin/x64/Release/*"
       
     - name: Install WiX Toolset
       if: steps.versionize.outcome == 'success'
