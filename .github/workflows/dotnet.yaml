@@ -59,18 +59,8 @@ jobs:
       id: versionize
       run: versionize --exit-insignificant-commits
       continue-on-error: true
-    
-    - name: Build the Solution
-      run: msbuild ${{env.APPLICATION_NAME}}.sln /p:Configuration=Release /p:Platform=x64
-    
-    - name: Test the Application
-      run: vstest.console.exe ./${{env.APPLICATION_NAME}}.Test/bin/x64/Release/${{env.APPLICATION_NAME}}.Test.dll /Platform:x64
-      
-    - name: No release required
-      if: steps.versionize.outcome != 'success'
-      run: echo "Skipping Release. No release required."
 
-    - name: Build
+    - name: Create a tag and zip app file name
       if: steps.versionize.outcome == 'success'
       shell: bash
       run: |
@@ -82,7 +72,33 @@ jobs:
         echo "TAG_NO_V=$tag_no_v" >> $GITHUB_ENV
         echo "APP_NAME=${tag}-x64.zip" >> $GITHUB_ENV
         echo "APP_NAME_2=${tag}-cli-x64.zip" >> $GITHUB_ENV
-        
+
+    - name: Set version in all AssemblyInfo.cs files
+      if: steps.versionize.outcome == 'success'
+      uses: secondbounce/assemblyinfo-update@v2
+      with:
+        version: ${{ env.TAG_NO_V }}
+    
+    - name: Commit the AssemblyInfo.cs"
+      if: steps.versionize.outcome == 'success'
+      run: |
+        git status
+        git commit -a -m "chore(update): ${{ env.TAG }} push to the AssemblyInfo.cs"
+    
+    - name: Build the Solution
+      run: msbuild ${{env.APPLICATION_NAME}}.sln /p:Configuration=Release /p:Platform=x64
+    
+    - name: Test the Application
+      run: vstest.console.exe ./${{env.APPLICATION_NAME}}.Test/bin/x64/Release/${{env.APPLICATION_NAME}}.Test.dll /Platform:x64
+      
+    - name: No release required
+      if: steps.versionize.outcome != 'success'
+      run: echo "Skipping Release. No release required."
+
+    - name: Build Package
+      if: steps.versionize.outcome == 'success'
+      shell: bash
+      run: |
         # Pack to zip for Windows
         7z a -tzip "${tag}-x64.zip" "./${APPLICATION_NAME}/bin/x64/Release/*"
         7z a -tzip "${tag}-cli-x64.zip" "./${APPLICATION_NAME_2}/bin/x64/Release/*"
@@ -139,18 +155,6 @@ jobs:
         tag_name: ${{ env.TAG }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Set version in all AssemblyInfo.cs files
-      if: steps.versionize.outcome == 'success'
-      uses: secondbounce/assemblyinfo-update@v2
-      with:
-        version: ${{ env.TAG_NO_V }}
-    
-    - name: Commit the AssemblyInfo.cs"
-      if: steps.versionize.outcome == 'success'
-      run: |
-        git status
-        git commit -a -m "chore(update): ${{ env.TAG }} push to the AssemblyInfo.cs"
 
     - name: Push changes to GitHub
       if: steps.versionize.outcome == 'success'
