@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="1.5.1"></a>
+## [1.5.1](https://www.github.com/zulfikar4568/BuildDotnetApp/releases/tag/v1.5.1) (2025-04-24)
+
+### Bug Fixes
+
+* rearrange the versionize ([70ca91a](https://www.github.com/zulfikar4568/BuildDotnetApp/commit/70ca91ae65150e35cc5c24ac617afc5563720452))
+
 <a name="1.5.0"></a>
 ## [1.5.0](https://www.github.com/zulfikar4568/BuildDotnetApp/releases/tag/v1.5.0) (2025-04-23)
 
