@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="1.5.2"></a>
+## [1.5.2](https://www.github.com/zulfikar4568/BuildDotnetApp/releases/tag/v1.5.2) (2025-04-24)
+
+### Bug Fixes
+
+* create a tag on assembly first ([657e5f6](https://www.github.com/zulfikar4568/BuildDotnetApp/commit/657e5f6678e206b642b6c38b1950e0e641ff5a3a))
+* tag name ([4e7fb8e](https://www.github.com/zulfikar4568/BuildDotnetApp/commit/4e7fb8e8d9b1304aab17f2948df199c30dc910e1))
+
 <a name="1.5.1"></a>
 ## [1.5.1](https://www.github.com/zulfikar4568/BuildDotnetApp/releases/tag/v1.5.1) (2025-04-24)
 
